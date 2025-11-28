@@ -1,0 +1,5 @@
+{
+  "name": "AI 创意表情包工坊",
+  "description": "专业的表情包与自媒体素材生成工具。利用 Gemini 高级视觉模型，一键生成 4x6 布局的趣味表情包、750x400 横幅及专属 Logo。支持自动切片、4K 画质与批量打包下载。",
+  "requestFramePermissions": []
+}
