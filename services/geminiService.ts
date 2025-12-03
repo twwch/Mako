@@ -69,14 +69,25 @@ const extractImage = (response: any): string => {
 
 export const generateMemeImage = async (params: MemePromptParams): Promise<string> => {
   const ai = getClient();
-  // Prompt optimized: Strict Safe Margin (Padding), No Clipping, Unified Style, Unified Background
+  // Prompt optimized: Strict Edge-to-Edge Layout to match slicing algorithm.
   const systemDirective = `
-    使用 4×6 布局；涵盖各种常用聊天语句或相关娱乐 meme。
-    其他需求：
-    1. 不要原图复制，需进行创意重绘或风格迁移。
-    2. 所有标注必须为手写简体中文。
-    3. 生成的图片需为 4K 分辨率 16:9。
-    4. 网格线应隐约或不可见，便于裁剪。
+    任务：生成一张包含 24 个表情包的 4x6 网格图。
+    
+    关键布局要求 (非常重要)：
+    1. **严格填满画布**：4x6 网格必须完全覆盖整张 16:9 图片，**绝对不要有任何外部边框、留白或边缘填充**。
+    2. **平均分布**：必须是标准的 6 列 x 4 行，每个格子的宽高完全一致。
+    3. **背景统一**：所有 24 个格子必须使用完全相同的纯色背景颜色 (例如淡黄色、淡粉色等)，不要使用多种颜色，不要渐变。
+    4. **安全边距**：文字和主要图案必须居中，**远离格子的四条边缘**，至少保留 15% 的内部边距，防止切割时文字被截断。
+
+    内容要求：
+    1. 涵盖各种常用聊天语句或娱乐梗。
+    2. 不要原图复制，需进行创意重绘，保持统一的角色形象和画风。
+    3. 所有标注必须为手写简体中文。
+    4. 分割线处理：尽量让分割线极细或与背景融合，确保在切割时不会留下明显的粗线条。
+
+    技术参数：
+    - 分辨率：4K
+    - 比例：16:9
   `;
 
   const finalPrompt = `${params.userPrompt}. ${systemDirective}`;
@@ -108,7 +119,6 @@ export const generateMemeImage = async (params: MemePromptParams): Promise<strin
 
 export const generateBanner = async (params: MemePromptParams): Promise<string> => {
   const ai = getClient();
-  // Banner specific prompt
   const bannerPrompt = `
     创建一个网站横幅图 (Banner)。
     内容：${params.userPrompt}。
@@ -132,7 +142,7 @@ export const generateBanner = async (params: MemePromptParams): Promise<string> 
     contents: { parts: parts },
     config: {
       imageConfig: {
-        imageSize: "2K", // Enough for 750px width
+        imageSize: "2K",
         aspectRatio: "16:9"
       }
     }
@@ -143,7 +153,6 @@ export const generateBanner = async (params: MemePromptParams): Promise<string> 
 
 export const generateLogo = async (params: MemePromptParams): Promise<string> => {
   const ai = getClient();
-  // Logo specific prompt
   const logoPrompt = `
     设计一个 App 图标 (Logo)。
     内容：${params.userPrompt}。
@@ -167,7 +176,7 @@ export const generateLogo = async (params: MemePromptParams): Promise<string> =>
     contents: { parts: parts },
     config: {
       imageConfig: {
-        imageSize: "1K", // Enough for logo
+        imageSize: "1K",
         aspectRatio: "1:1"
       }
     }

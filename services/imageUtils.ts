@@ -100,7 +100,7 @@ export const sliceMemeGrid = async (imageBase64: string): Promise<SlicedImage[]>
 
       const cellWidth = img.width / COLS;
       const cellHeight = img.height / ROWS;
-      const borderRadius = Math.min(cellWidth, cellHeight) * 0.1; // 10% radius
+      const borderRadius = Math.min(cellWidth, cellHeight) * 0.05; // Reduced to 5% radius to avoid corner clipping
       
       // NO CROP/ZOOM: We use exact coordinates to prevent text clipping.
       // const CROP_RATIO = 0; 
