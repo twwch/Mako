@@ -69,6 +69,7 @@ const extractImage = (response: any): string => {
 
 export const generateMemeImage = async (params: MemePromptParams): Promise<string> => {
   const ai = getClient();
+  // Prompt optimized: Strict Safe Margin (Padding), No Clipping, Unified Style, Unified Background
   const systemDirective = `
     使用 4×6 布局；涵盖各种常用聊天语句或相关娱乐 meme。
     其他需求：

@@ -100,6 +100,10 @@ export const sliceMemeGrid = async (imageBase64: string): Promise<SlicedImage[]>
 
       const cellWidth = img.width / COLS;
       const cellHeight = img.height / ROWS;
+      const borderRadius = Math.min(cellWidth, cellHeight) * 0.1; // 10% radius
+      
+      // NO CROP/ZOOM: We use exact coordinates to prevent text clipping.
+      // const CROP_RATIO = 0; 
 
       // Iterate through grid
       for (let row = 0; row < ROWS; row++) {
@@ -107,19 +111,45 @@ export const sliceMemeGrid = async (imageBase64: string): Promise<SlicedImage[]>
           // Resize canvas for the cell
           canvas.width = cellWidth;
           canvas.height = cellHeight;
+          
+          // Clear canvas (ensures transparent background outside the rounded rect)
+          ctx.clearRect(0, 0, cellWidth, cellHeight);
 
-          // Draw the specific portion of the source image
+          // Create rounded rectangle path for aesthetic clipping (optional but good for stickers)
+          ctx.beginPath();
+          ctx.moveTo(borderRadius, 0);
+          ctx.lineTo(cellWidth - borderRadius, 0);
+          ctx.quadraticCurveTo(cellWidth, 0, cellWidth, borderRadius);
+          ctx.lineTo(cellWidth, cellHeight - borderRadius);
+          ctx.quadraticCurveTo(cellWidth, cellHeight, cellWidth - borderRadius, cellHeight);
+          ctx.lineTo(borderRadius, cellHeight);
+          ctx.quadraticCurveTo(0, cellHeight, 0, cellHeight - borderRadius);
+          ctx.lineTo(0, borderRadius);
+          ctx.quadraticCurveTo(0, 0, borderRadius, 0);
+          ctx.closePath();
+          
+          // Clip to the rounded rectangle
+          ctx.save();
+          ctx.clip();
+
+          // Standard 1:1 Drawing without zoom/cropping
+          const sourceX = col * cellWidth;
+          const sourceY = row * cellHeight;
+          
           ctx.drawImage(
             img,
-            col * cellWidth, // sx
-            row * cellHeight, // sy
-            cellWidth,        // sWidth
-            cellHeight,       // sHeight
+            sourceX,          // sx: Exact start x
+            sourceY,          // sy: Exact start y
+            cellWidth,        // sWidth: Exact width
+            cellHeight,       // sHeight: Exact height
             0,                // dx
             0,                // dy
-            cellWidth,        // dWidth
+            cellWidth,        // dWidth 
             cellHeight        // dHeight
           );
+          
+          // Restore context
+          ctx.restore();
 
           const dataUrl = canvas.toDataURL('image/png');
           
